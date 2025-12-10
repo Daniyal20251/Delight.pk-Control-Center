@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delight PK - Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{
+  background:#f3f4f7;
+  color:#333;
+  padding-bottom:70px;
+  font-size:14px;
+}
+header{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  height:60px;
+  background:linear-gradient(135deg,#ff6a00,#ff3d00);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:18px;
+  font-weight:600;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  border-bottom-left-radius:18px;
+  border-bottom-right-radius:18px;
+  z-index:100;
+}
+.container{
+  padding:18px;
+  margin-top:50px;
+}
+.toggle-bar{
+  display:flex;
+  justify-content:center;
+  margin-bottom:20px;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
+}
+.toggle-btn{
+  flex:1;
+  padding:10px 0;
+  text-align:center;
+  font-weight:600;
+  cursor:pointer;
+  background:#fff;
+  color:#333;
+  transition:0.3s;
+}
+.toggle-btn.active{
+  background:#ff3d00;
+  color:#fff;
+}
+.order-card{
+  background:#fff;
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:18px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+.order-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 6px 20px rgba(0,0,0,0.12);
+}
+.order-card p{
+  margin:5px 0;
+  font-size:13px;
+}
+.order-card img{
+  width:100%;
+  border-radius:10px;
+  margin-top:10px;
+  border:1px solid #ddd;
+}
+.empty{
+  text-align:center;
+  font-size:14px;
+  padding:15px 0;
+  color:#555;
+}
+.verify-btn{
+  margin-top:12px;
+  width:100%;
+  padding:10px;
+  background:#28a745;
+  color:white;
+  font-size:13px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+.unverify-btn{
+  margin-top:12px;
+  width:100%;
+  padding:10px;
+  background:#ff3d00;
+  color:white;
+  font-size:13px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+.sub-order{
+  margin-top:12px;
+  padding:10px;
+  background:#fafafa;
+  border-radius:10px;
+  border-left:4px solid orange;
+}
+</style>
+</head>
+<body>
+
+<header>Delight PK Admin Panel</header>
+
+<div class="container">
+
+  <div class="toggle-bar">
+    <div class="toggle-btn active" id="btnNotVerified">Not Verified</div>
+    <div class="toggle-btn" id="btnVerified">Verified</div>
+  </div>
+
+  <div id="contentList">
+    Loading payouts...
+  </div>
+
+</div>
+
+<script>
+let allPayouts = [];
+let verifiedPayouts = [];
+let showingVerified = false;
+
+async function loadPayouts(){
+  const list = document.getElementById("contentList");
+  list.innerHTML = "Loading payouts...";
+
+  try{
+    const res = await fetch("https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/payment");
+    const data = await res.json();
+    allPayouts = data.filter(p => p.status !== "Verified");
+    verifiedPayouts = data.filter(p => p.status === "Verified");
+    renderContent();
+  }catch(err){
+    console.error(err);
+    list.innerHTML = "<p class='empty' style='color:red;'>Error loading payout orders.</p>";
+  }
+}
+
+function renderContent(){
+  const list = document.getElementById("contentList");
+  list.innerHTML = "";
+
+  let dataToShow = showingVerified ? verifiedPayouts : allPayouts;
+  dataToShow = dataToShow.slice().reverse();
+
+  if(dataToShow.length === 0){
+    list.innerHTML = `<p class='empty'>No ${showingVerified ? "verified" : "not verified"} payments.</p>`;
+    return;
+  }
+
+  dataToShow.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "order-card";
+
+    div.innerHTML = `
+      <p><strong>Seller:</strong> ${p.seller?.name || "N/A"} (${p.seller?.phone || "N/A"})</p>
+      <p><strong>Store:</strong> ${p.storeName || "N/A"}</p>
+      <p><strong>Time:</strong> ${new Date(p.timestamp).toLocaleString()}</p><br>
+
+      <p><strong>Invoice Photo:</strong></p>
+      ${p.invoicePhoto ? `<img src="${p.invoicePhoto}">` : "N/A"}
+      <br><h4 style="margin-top:12px;">Orders:</h4>
+    `;
+
+    p.orders.forEach(order => {
+      const product = order.product || {};
+      const box = document.createElement("div");
+      box.className = "sub-order";
+
+      box.innerHTML = `
+        <p><strong>Payment ID:</strong> ${order.paymentId}</p>
+        <p><strong>Product:</strong> ${product.title}</p>
+        <p><strong>Price:</strong> Rs ${product.price}</p>
+        <p><strong>Service Fee:</strong> Rs ${order.serviceFee}</p>
+        ${showingVerified ? "" : `<p><strong>Status:</strong> ${order.status}</p>`}
+      `;
+      div.appendChild(box);
+    });
+
+    const btn = document.createElement("button");
+    if(showingVerified){
+      btn.className = "unverify-btn";
+      btn.innerText = "Unverify Payment";
+      btn.onclick = () => togglePaymentStatus(p.id, "Pending");
+    }else{
+      btn.className = "verify-btn";
+      btn.innerText = "Verify Payment";
+      btn.onclick = () => togglePaymentStatus(p.id, "Verified");
+    }
+
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+
+async function togglePaymentStatus(id, newStatus){
+  try{
+    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/payment/${id}`, {
+      method: "PUT",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+    if(data.success){
+      loadPayouts(); // reload lists from backend
+    } else {
+      alert("Failed to update payment status");
+    }
+  }catch(err){
+    console.error(err);
+    alert("Error updating payment status");
+  }
+}
+
+// Toggle buttons
+document.getElementById("btnNotVerified").onclick = () => {
+  showingVerified = false;
+  document.getElementById("btnNotVerified").classList.add("active");
+  document.getElementById("btnVerified").classList.remove("active");
+  renderContent();
+}
+
+document.getElementById("btnVerified").onclick = () => {
+  showingVerified = true;
+  document.getElementById("btnVerified").classList.add("active");
+  document.getElementById("btnNotVerified").classList.remove("active");
+  renderContent();
+}
+
+loadPayouts();
+</script>
+
+</body>
+</html>

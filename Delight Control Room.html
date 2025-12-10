@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Delight Control Room</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ---------- GLOBAL ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 28px;
+}
+
+/* ---------- WRAPPER ---------- */
+.wrapper {
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 22px;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 35px rgba(255, 140, 0, 0.25);
+  animation: fadeUp 0.6s ease-out;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- TITLE ---------- */
+.title {
+  text-align: center;
+  color: #fff;
+  font-size: 19px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* ---------- GRID ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ---------- CARD ---------- */
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 18px 12px;
+  border-radius: 16px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  cursor: pointer;
+  transition: 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover: Orange Glow */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px rgba(255, 153, 0, 0.55);
+  border-color: rgba(255, 153, 0, 0.9);
+}
+
+/* Shine Animation */
+.card::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  left: -80px;
+  width: 70px;
+  height: 250px;
+  background: rgba(255, 255, 255, 0.12);
+  transform: rotate(35deg);
+  transition: 0.5s;
+}
+.card:hover::after {
+  left: 130%;
+}
+
+/* ---------- ICONS ---------- */
+.icon {
+  font-size: 25px;
+  color: #ff8b00;
+  margin-bottom: 8px;
+}
+
+/* ---------- LABEL ---------- */
+.label {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 300;
+}
+
+/* ---------- FOOTER ---------- */
+.footer {
+  text-align: center;
+  margin-top: 22px;
+  font-size: 11px;
+  color: #bbb;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <h1 class="title">Delight Control Room</h1>
+
+  <div class="grid">
+
+      <div class="card" onclick="openPage('UploadAds.html')">
+        <div class="icon">📰</div>
+        <div class="label">Manage Ads</div>
+      </div>
+
+      <div class="card" onclick="openPage('VerifyPayment.html')">
+        <div class="icon">✔️</div>
+        <div class="label">Verify Payments</div>
+      </div>
+
+      <div class="card" onclick="openPage('ResponsePayment.html')">
+        <div class="icon">📦</div>
+        <div class="label">Orders & Payments</div>
+      </div>
+
+      <div class="card" onclick="openPage('ServiceFee.html')">
+        <div class="icon">💰</div>
+        <div class="label">Service Fee</div>
+      </div>
+
+  </div>
+
+  <div class="footer">© 2025 Daniya Arain | Owner Of Delight.pk</div>
+
+</div>
+
+<script>
+function openPage(link) {
+  window.location.href = link;
+}
+</script>
+
+</body>
+</html>
