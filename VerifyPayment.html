@@ -3,250 +3,680 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Delight PK - Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
+<title>Admin - Domain Management</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --bg-body: #0a0a1a;
+  --bg-card: #16162a;
+  --bg-input: #1e1e3a;
+  --text-primary: #e8e8f0;
+  --text-secondary: #a0a0c0;
+  --text-heading: #ff8c00;
+  --border-input: #2a2a4a;
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.5);
+  --premium-purple: #7c3aed;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+}
+
 body{
-  background:#f3f4f7;
-  color:#333;
-  padding-bottom:70px;
-  font-size:14px;
+  font-family:'Segoe UI',sans-serif;
+  background: var(--bg-body);
+  min-height:100vh;
+  padding:20px;
+  color: var(--text-primary);
 }
-header{
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  height:60px;
-  background:linear-gradient(135deg,#ff6a00,#ff3d00);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:18px;
-  font-weight:600;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  border-bottom-left-radius:18px;
-  border-bottom-right-radius:18px;
-  z-index:100;
-}
+
 .container{
-  padding:18px;
-  margin-top:50px;
+  max-width:1200px;
+  margin:0 auto;
 }
-.toggle-bar{
-  display:flex;
-  justify-content:center;
-  margin-bottom:20px;
-  border-radius:10px;
-  overflow:hidden;
-  box-shadow:0 3px 8px rgba(0,0,0,0.15);
-}
-.toggle-btn{
-  flex:1;
-  padding:10px 0;
+
+h1{
+  color: var(--text-heading);
   text-align:center;
-  font-weight:600;
-  cursor:pointer;
-  background:#fff;
-  color:#333;
-  transition:0.3s;
+  margin-bottom:30px;
+  font-size:24px;
 }
-.toggle-btn.active{
-  background:#ff3d00;
-  color:#fff;
+
+h2{
+  color: var(--premium-purple);
+  margin:30px 0 15px;
+  font-size:18px;
+  border-bottom: 2px solid var(--premium-purple);
+  padding-bottom: 8px;
 }
-.order-card{
-  background:#fff;
-  padding:15px;
-  border-radius:15px;
-  margin-bottom:18px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.08);
+
+.stats-bar{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
 }
-.order-card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 6px 20px rgba(0,0,0,0.12);
+
+.stat-card{
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
 }
-.order-card p{
-  margin:5px 0;
-  font-size:13px;
+
+.stat-card i{
+  font-size: 28px;
+  margin-bottom: 10px;
 }
-.order-card img{
-  width:100%;
-  border-radius:10px;
-  margin-top:10px;
-  border:1px solid #ddd;
+
+.stat-card .number{
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 5px;
 }
-.empty{
-  text-align:center;
-  font-size:14px;
-  padding:15px 0;
-  color:#555;
+
+.stat-card .label{
+  font-size: 13px;
+  color: var(--text-secondary);
 }
-.verify-btn{
-  margin-top:12px;
-  width:100%;
-  padding:10px;
-  background:#28a745;
-  color:white;
-  font-size:13px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:600;
+
+.table-container{
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 30px;
 }
-.unverify-btn{
-  margin-top:12px;
-  width:100%;
-  padding:10px;
-  background:#ff3d00;
-  color:white;
-  font-size:13px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:600;
+
+table{
+  width: 100%;
+  border-collapse: collapse;
 }
-.sub-order{
-  margin-top:12px;
-  padding:10px;
-  background:#fafafa;
-  border-radius:10px;
-  border-left:4px solid orange;
+
+th{
+  background: var(--bg-input);
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td{
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-input);
+  font-size: 14px;
+}
+
+tr:hover{
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.status-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-pending{
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.status-approved{
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success);
+}
+
+.status-rejected{
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.status-active{
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.status-dns-pending{
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--info);
+}
+
+.status-awaiting{
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
+.btn{
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 2px;
+  transition: all 0.3s;
+}
+
+.btn-approve{
+  background: var(--success);
+  color: white;
+}
+
+.btn-approve:hover{
+  background: #16a34a;
+}
+
+.btn-reject{
+  background: var(--danger);
+  color: white;
+}
+
+.btn-reject:hover{
+  background: #dc2626;
+}
+
+.btn-verify{
+  background: var(--info);
+  color: white;
+}
+
+.btn-verify:hover{
+  background: #2563eb;
+}
+
+.btn-refresh{
+  background: var(--premium-purple);
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.btn-refresh:hover{
+  background: #6d28d9;
+}
+
+.empty-state{
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.empty-state i{
+  font-size: 48px;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 90%;
+  max-width: 350px;
+}
+
+.toast {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: slideIn 0.4s ease;
+  border-left: 5px solid var(--premium-purple);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast-icon {
+  width: 42px;
+  height: 42px;
+  background: var(--premium-purple);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+}
+
+.toast-content { flex: 1; }
+.toast-title { font-weight: 700; color: var(--text-primary); font-size: 15px; }
+.toast-msg { color: var(--text-secondary); font-size: 13px; }
+
+@media (max-width: 768px) {
+  body{ padding: 10px; }
+  th, td{ padding: 10px 12px; font-size: 12px; }
+  .btn{ padding: 5px 10px; font-size: 11px; }
+  table{ display: block; overflow-x: auto; }
 }
 </style>
 </head>
 <body>
 
-<header>Delight PK Admin Panel</header>
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="container">
+  <h1><i class="fas fa-shield-alt"></i> Admin Domain Management</h1>
 
-  <div class="toggle-bar">
-    <div class="toggle-btn active" id="btnNotVerified">Not Verified</div>
-    <div class="toggle-btn" id="btnVerified">Verified</div>
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <i class="fas fa-clock" style="color: var(--warning);"></i>
+      <div class="number" id="pendingCount">0</div>
+      <div class="label">Pending Approval</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-check-circle" style="color: #a78bfa;"></i>
+      <div class="number" id="approvedCount">0</div>
+      <div class="label">Approved (DNS Setup)</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-server" style="color: var(--info);"></i>
+      <div class="number" id="dnsPendingCount">0</div>
+      <div class="label">DNS Pending Verify</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-globe" style="color: var(--success);"></i>
+      <div class="number" id="activeCount">0</div>
+      <div class="label">Active Domains</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-times-circle" style="color: var(--danger);"></i>
+      <div class="number" id="rejectedCount">0</div>
+      <div class="label">Rejected</div>
+    </div>
   </div>
 
-  <div id="contentList">
-    Loading payouts...
+  <button class="btn btn-refresh" onclick="loadAllRequests()">
+    <i class="fas fa-sync-alt"></i> Refresh Data
+  </button>
+
+  <!-- Pending Requests -->
+  <h2><i class="fas fa-clock"></i> Pending Requests (Admin Approval Needed)</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Seller</th>
+          <th>Phone</th>
+          <th>Domain</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="pendingTable">
+        <tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No pending requests</td></tr>
+      </tbody>
+    </table>
   </div>
 
+  <!-- Approved - Awaiting DNS Setup -->
+  <h2><i class="fas fa-check-circle"></i> Approved - Awaiting Seller DNS Setup</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Seller</th>
+          <th>Phone</th>
+          <th>Domain</th>
+          <th>Setup Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="approvedTable">
+        <tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No approved requests awaiting setup</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DNS Pending Verification -->
+  <h2><i class="fas fa-server"></i> DNS Pending Verification (Admin Verify Needed)</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Seller</th>
+          <th>Phone</th>
+          <th>Domain</th>
+          <th>DNS Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="dnsPendingTable">
+        <tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No DNS pending verification</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Active Domains -->
+  <h2><i class="fas fa-globe"></i> Active Domains</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Seller</th>
+          <th>Phone</th>
+          <th>Domain</th>
+          <th>Status</th>
+          <th>Repo</th>
+        </tr>
+      </thead>
+      <tbody id="activeTable">
+        <tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No active domains</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Rejected -->
+  <h2><i class="fas fa-times-circle"></i> Rejected Requests</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Seller</th>
+          <th>Phone</th>
+          <th>Domain</th>
+          <th>Reason</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="rejectedTable">
+        <tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No rejected requests</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-let allPayouts = [];
-let verifiedPayouts = [];
-let showingVerified = false;
+const API_BASE = "https://delight-backend--araindaniyalo2.replit.app";
 
-async function loadPayouts(){
-  const list = document.getElementById("contentList");
-  list.innerHTML = "Loading payouts...";
+function showToast(title, message, icon = "fa-bell", color = "#7c3aed") {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.style.borderLeftColor = color;
+  toast.innerHTML = `
+    <div class="toast-icon" style="background: ${color};"><i class="fas ${icon}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-msg">${message}</div>
+    </div>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
 
-  try{
-    const res = await fetch("https://delight-backend--araindaniyalo2.replit.app/payment");
+async function loadAllRequests() {
+  try {
+    const res = await fetch(`${API_BASE}/admin/domain-requests`);
     const data = await res.json();
-    allPayouts = data.filter(p => p.status !== "Verified");
-    verifiedPayouts = data.filter(p => p.status === "Verified");
-    renderContent();
-  }catch(err){
-    console.error(err);
-    list.innerHTML = "<p class='empty' style='color:red;'>Error loading payout orders.</p>";
+
+    if(!data.success) {
+      showToast("Error", "Failed to load requests", "fa-times", "#ef4444");
+      return;
+    }
+
+    const requests = data.requests || [];
+    
+    console.log("=== ALL REQUESTS ===");
+    requests.forEach(r => {
+      console.log("Phone:", r.phone, 
+                  "| status:", r.status, 
+                  "| domainStatus:", r.domainStatus, 
+                  "| domainSetupStatus:", r.domainSetupStatus);
+    });
+
+    // CATEGORIZATION based on backend fields:
+    
+    // 1. PENDING APPROVAL: status === 'pending'
+    const pending = requests.filter(r => r.status === 'pending');
+
+    // 2. APPROVED - AWAITING DNS SETUP:
+    //    status === 'approved' AND domainSetupStatus === 'not_started'
+    const approvedNotStarted = requests.filter(r => 
+      r.status === 'approved' && 
+      r.domainSetupStatus === 'not_started'
+    );
+
+    // 3. DNS PENDING VERIFICATION:
+    //    status === 'approved' AND domainSetupStatus === 'pending'
+    const dnsPending = requests.filter(r => 
+      r.status === 'approved' && 
+      r.domainSetupStatus === 'pending'
+    );
+
+    // 4. ACTIVE:
+    //    status === 'approved' AND domainStatus === 'active'
+    const active = requests.filter(r => 
+      r.status === 'approved' && 
+      r.domainStatus === 'active'
+    );
+
+    // 5. REJECTED:
+    //    status === 'rejected'
+    const rejected = requests.filter(r => r.status === 'rejected');
+
+    console.log("Pending:", pending.length);
+    console.log("Approved Not Started:", approvedNotStarted.length);
+    console.log("DNS Pending:", dnsPending.length);
+    console.log("Active:", active.length);
+    console.log("Rejected:", rejected.length);
+
+    // Update stats
+    document.getElementById('pendingCount').textContent = pending.length;
+    document.getElementById('approvedCount').textContent = approvedNotStarted.length;
+    document.getElementById('dnsPendingCount').textContent = dnsPending.length;
+    document.getElementById('activeCount').textContent = active.length;
+    document.getElementById('rejectedCount').textContent = rejected.length;
+
+    // Render tables
+    renderPendingTable(pending);
+    renderApprovedTable(approvedNotStarted);
+    renderDnsPendingTable(dnsPending);
+    renderActiveTable(active);
+    renderRejectedTable(rejected);
+
+  } catch(err) {
+    console.error("Load error:", err);
+    showToast("Error", "Failed to load data: " + err.message, "fa-times", "#ef4444");
   }
 }
 
-function renderContent(){
-  const list = document.getElementById("contentList");
-  list.innerHTML = "";
-
-  let dataToShow = showingVerified ? verifiedPayouts : allPayouts;
-  dataToShow = dataToShow.slice().reverse();
-
-  if(dataToShow.length === 0){
-    list.innerHTML = `<p class='empty'>No ${showingVerified ? "verified" : "not verified"} payments.</p>`;
+function renderPendingTable(requests) {
+  const tbody = document.getElementById('pendingTable');
+  if(requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No pending requests</td></tr>';
     return;
   }
 
-  dataToShow.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "order-card";
-
-    div.innerHTML = `
-      <p><strong>Seller:</strong> ${p.seller?.name || "N/A"} (${p.seller?.phone || "N/A"})</p>
-      <p><strong>Store:</strong> ${p.storeName || "N/A"}</p>
-      <p><strong>Time:</strong> ${new Date(p.timestamp).toLocaleString()}</p><br>
-
-      <p><strong>Invoice Photo:</strong></p>
-      ${p.invoicePhoto ? `<img src="${p.invoicePhoto}">` : "N/A"}
-      <br><h4 style="margin-top:12px;">Orders:</h4>
-    `;
-
-    p.orders.forEach(order => {
-      const product = order.product || {};
-      const box = document.createElement("div");
-      box.className = "sub-order";
-
-      box.innerHTML = `
-        <p><strong>Payment ID:</strong> ${order.paymentId}</p>
-        <p><strong>Product:</strong> ${product.title}</p>
-        <p><strong>Price:</strong> Rs ${product.price}</p>
-        <p><strong>Service Fee:</strong> Rs ${order.serviceFee}</p>
-        ${showingVerified ? "" : `<p><strong>Status:</strong> ${order.status}</p>`}
-      `;
-      div.appendChild(box);
-    });
-
-    const btn = document.createElement("button");
-    if(showingVerified){
-      btn.className = "unverify-btn";
-      btn.innerText = "Unverify Payment";
-      btn.onclick = () => togglePaymentStatus(p.id, "Pending");
-    }else{
-      btn.className = "verify-btn";
-      btn.innerText = "Verify Payment";
-      btn.onclick = () => togglePaymentStatus(p.id, "Verified");
-    }
-
-    div.appendChild(btn);
-    list.appendChild(div);
-  });
+  tbody.innerHTML = requests.map(r => `
+    <tr>
+      <td><b>${r.name || 'Unknown'}</b></td>
+      <td>${r.phone}</td>
+      <td><code>${r.requestedDomain}</code></td>
+      <td><span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span></td>
+      <td>
+        <button class="btn btn-approve" onclick="approveDomain('${r.phone}', '${r.requestedDomain}')">
+          <i class="fas fa-check"></i> Approve
+        </button>
+        <button class="btn btn-reject" onclick="rejectDomain('${r.phone}')">
+          <i class="fas fa-times"></i> Reject
+        </button>
+      </td>
+    </tr>
+  `).join('');
 }
 
-async function togglePaymentStatus(id, newStatus){
-  try{
-    const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/payment/${id}`, {
-      method: "PUT",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ status: newStatus })
+function renderApprovedTable(requests) {
+  const tbody = document.getElementById('approvedTable');
+  
+  if(requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No approved requests awaiting setup</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = requests.map(r => `
+    <tr>
+      <td><b>${r.name || 'Unknown'}</b></td>
+      <td>${r.phone}</td>
+      <td><code>${r.requestedDomain}</code></td>
+      <td><span class="status-badge status-awaiting"><i class="fas fa-hourglass-start"></i> Not Started</span></td>
+      <td>
+        <span style="color: var(--text-secondary); font-size: 12px;">
+          <i class="fas fa-info-circle"></i> Waiting for seller DNS setup
+        </span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderDnsPendingTable(requests) {
+  const tbody = document.getElementById('dnsPendingTable');
+  
+  if(requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No DNS pending verification</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = requests.map(r => `
+    <tr>
+      <td><b>${r.name || 'Unknown'}</b></td>
+      <td>${r.phone}</td>
+      <td><code>${r.requestedDomain}</code></td>
+      <td><span class="status-badge status-dns-pending"><i class="fas fa-clock"></i> Verify Needed</span></td>
+      <td>
+        <button class="btn btn-verify" onclick="verifyDns('${r.phone}', '${r.requestedDomain}')">
+          <i class="fas fa-check-double"></i> Verify & Activate
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderActiveTable(requests) {
+  const tbody = document.getElementById('activeTable');
+  if(requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No active domains</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = requests.map(r => `
+    <tr>
+      <td><b>${r.name || 'Unknown'}</b></td>
+      <td>${r.phone}</td>
+      <td><a href="https://${r.activeDomain || r.requestedDomain}" target="_blank" style="color: var(--success);"><code>${r.activeDomain || r.requestedDomain}</code></a></td>
+      <td><span class="status-badge status-active"><i class="fas fa-globe"></i> Active</span></td>
+      <td><code>${r.assignedRepo || '-'}</code></td>
+    </tr>
+  `).join('');
+}
+
+function renderRejectedTable(requests) {
+  const tbody = document.getElementById('rejectedTable');
+  if(requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No rejected requests</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = requests.map(r => `
+    <tr>
+      <td><b>${r.name || 'Unknown'}</b></td>
+      <td>${r.phone}</td>
+      <td><code>${r.requestedDomain}</code></td>
+      <td style="color: var(--danger); font-size: 12px;">${r.rejectedReason || '-'}</td>
+      <td><span class="status-badge status-rejected"><i class="fas fa-times"></i> Rejected</span></td>
+    </tr>
+  `).join('');
+}
+
+async function approveDomain(phone, domain) {
+  try {
+    const res = await fetch(`${API_BASE}/admin/approve-domain`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, assignedRepo: domain })
     });
     const data = await res.json();
-    if(data.success){
-      loadPayouts(); // reload lists from backend
+
+    if(data.success) {
+      showToast("✅ Approved", `Domain ${domain} approved. Waiting for DNS setup.`, "fa-check", "#22c55e");
+      loadAllRequests();
     } else {
-      alert("Failed to update payment status");
+      showToast("❌ Error", data.message, "fa-times", "#ef4444");
     }
-  }catch(err){
-    console.error(err);
-    alert("Error updating payment status");
+  } catch(err) {
+    showToast("❌ Error", "Failed to approve", "fa-times", "#ef4444");
   }
 }
 
-// Toggle buttons
-document.getElementById("btnNotVerified").onclick = () => {
-  showingVerified = false;
-  document.getElementById("btnNotVerified").classList.add("active");
-  document.getElementById("btnVerified").classList.remove("active");
-  renderContent();
+async function rejectDomain(phone) {
+  const reason = prompt("Enter rejection reason:");
+  if(!reason) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/reject-domain`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, reason })
+    });
+    const data = await res.json();
+
+    if(data.success) {
+      showToast("✅ Rejected", "Domain request rejected", "fa-check", "#ef4444");
+      loadAllRequests();
+    } else {
+      showToast("❌ Error", data.message, "fa-times", "#ef4444");
+    }
+  } catch(err) {
+    showToast("❌ Error", "Failed to reject", "fa-times", "#ef4444");
+  }
 }
 
-document.getElementById("btnVerified").onclick = () => {
-  showingVerified = true;
-  document.getElementById("btnVerified").classList.add("active");
-  document.getElementById("btnNotVerified").classList.remove("active");
-  renderContent();
+async function verifyDns(phone, domain) {
+  try {
+    showToast("⏳ Verifying", `Verifying DNS for ${domain}...`, "fa-spinner fa-spin", "#3b82f6");
+    
+    const res = await fetch(`${API_BASE}/admin/verify-dns`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+
+    if(data.success) {
+      showToast("✅ Verified", `DNS verified. ${domain} is now active!`, "fa-check", "#22c55e");
+      loadAllRequests();
+    } else {
+      showToast("⚠️ Note", data.message, "fa-exclamation-triangle", "#f59e0b");
+    }
+  } catch(err) {
+    showToast("❌ Error", "Failed to verify DNS", "fa-times", "#ef4444");
+  }
 }
 
-loadPayouts();
+// Load on page load
+window.addEventListener('load', loadAllRequests);
 </script>
 
 </body>
