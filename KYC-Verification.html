@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KYC Admin Panel – Delight</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; min-height: 100vh; }
+
+  /* TOPBAR */
+  .topbar { background: #fff; border-bottom: 1px solid #e8eaed; position: sticky; top: 0; z-index: 100; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar h1 { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+  .topbar p  { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+  .refresh-btn { background: #f3f4f6; border: none; border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: 13px; color: #555; font-weight: 600; transition: background .2s; }
+  .refresh-btn:hover { background: #e5e7eb; }
+
+  /* TABS */
+  .tabs { padding: 10px 24px 0; display: flex; gap: 6px; background: #fff; border-bottom: 1px solid #e8eaed; }
+  .tab { padding: 8px 18px; border-radius: 10px 10px 0 0; border: none; cursor: pointer; font-size: 13px; font-weight: 600; color: #6b7280; background: transparent; transition: all .2s; }
+  .tab.active { background: #7c3aed; color: #fff; }
+  .tab:hover:not(.active) { background: #f3f4f6; }
+
+  /* SEARCH */
+  .search-bar { padding: 16px 24px 8px; }
+  .search-bar input { width: 100%; max-width: 340px; padding: 10px 16px; border: 1.5px solid #e5e7eb; border-radius: 12px; font-size: 14px; color: #374151; background: #fff; outline: none; transition: border .2s; }
+  .search-bar input:focus { border-color: #7c3aed; }
+
+  /* GRID */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 8px 24px 40px; }
+
+  /* CARD */
+  .card { background: #fff; border-radius: 18px; border: 1px solid #f0f0f4; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; transition: box-shadow .2s; }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #f8f8fb; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .seller-info { margin-left: 10px; }
+  .seller-name { font-size: 14px; font-weight: 600; color: #111827; }
+  .seller-phone { font-size: 12px; color: #9ca3af; margin-top: 1px; }
+
+  /* STATUS BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .badge-pending  { background: #fef3c7; color: #92400e; } .badge-pending .badge-dot  { background: #f59e0b; }
+  .badge-approved { background: #d1fae5; color: #065f46; } .badge-approved .badge-dot { background: #10b981; }
+  .badge-rejected { background: #fee2e2; color: #991b1b; } .badge-rejected .badge-dot { background: #ef4444; }
+  .badge-not_submitted { background: #f3f4f6; color: #6b7280; } .badge-not_submitted .badge-dot { background: #9ca3af; }
+
+  /* BODY */
+  .card-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .info-box { background: #f9fafb; border-radius: 10px; padding: 10px 12px; }
+  .info-label { font-size: 11px; color: #9ca3af; margin-bottom: 2px; }
+  .info-value { font-size: 13px; font-weight: 600; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .submitted-at { font-size: 11px; color: #9ca3af; }
+
+  .reject-note { background: #fff5f5; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 12px; }
+  .reject-note-label { font-size: 11px; font-weight: 600; color: #dc2626; }
+  .reject-note-text { font-size: 12px; color: #b91c1c; margin-top: 2px; }
+
+  /* CNIC IMAGES */
+  .cnic-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cnic-box { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid #e5e7eb; cursor: pointer; height: 90px; transition: border-color .2s; }
+  .cnic-box:hover { border-color: #7c3aed; }
+  .cnic-box img { width: 100%; height: 100%; object-fit: cover; }
+  .cnic-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); display: flex; align-items: center; justify-content: center; transition: background .2s; }
+  .cnic-box:hover .cnic-overlay { background: rgba(0,0,0,.35); }
+  .cnic-overlay span { color: #fff; font-size: 12px; font-weight: 600; opacity: 0; transition: opacity .2s; }
+  .cnic-box:hover .cnic-overlay span { opacity: 1; }
+  .cnic-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.45); color: #fff; font-size: 10px; text-align: center; padding: 3px; }
+  .cnic-empty { border: 2px dashed #e5e7eb; border-radius: 10px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #d1d5db; }
+
+  /* ACTIONS */
+  .card-footer { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn { flex: 1; padding: 10px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-approve { background: #10b981; color: #fff; }
+  .btn-approve:hover:not(:disabled) { background: #059669; }
+  .btn-reject  { background: #fff0f0; color: #dc2626; border: 1.5px solid #fecaca; }
+  .btn-reject:hover:not(:disabled)  { background: #fee2e2; }
+  .btn-confirm { background: #ef4444; color: #fff; }
+  .btn-confirm:hover:not(:disabled) { background: #dc2626; }
+  .btn-cancel  { padding: 10px 14px; background: #f3f4f6; color: #6b7280; border: none; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-cancel:hover { background: #e5e7eb; }
+  .btn-reapprove { width: 100%; padding: 10px; background: #7c3aed; color: #fff; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .2s; }
+  .btn-reapprove:hover:not(:disabled) { background: #6d28d9; }
+
+  textarea.reject-input { width: 100%; padding: 10px 12px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 13px; resize: none; outline: none; font-family: inherit; transition: border .2s; color: #374151; }
+  textarea.reject-input:focus { border-color: #ef4444; }
+
+  .approved-banner { background: #ecfdf5; border-radius: 12px; padding: 10px; text-align: center; font-size: 12px; font-weight: 600; color: #065f46; }
+
+  /* EMPTY / LOADING */
+  .state-box { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0; gap: 12px; }
+  .state-icon { font-size: 40px; }
+  .state-title { font-size: 15px; font-weight: 600; color: #6b7280; }
+  .state-sub { font-size: 12px; color: #9ca3af; }
+  .spinner { width: 36px; height: 36px; border: 4px solid #ede9fe; border-top-color: #7c3aed; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* MODAL */
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 999; align-items: center; justify-content: center; }
+  .modal-bg.open { display: flex; }
+  .modal-img { max-width: 90vw; max-height: 85vh; border-radius: 14px; object-fit: contain; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .modal-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,.15); border: none; color: #fff; font-size: 20px; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; transition: background .2s; }
+  .modal-close:hover { background: rgba(255,255,255,.3); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 12px 22px; border-radius: 14px; font-size: 14px; font-weight: 600; color: #fff; opacity: 0; transition: all .3s; z-index: 1000; white-space: nowrap; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #10b981; }
+  .toast.error   { background: #ef4444; }
+
+  /* META */
+  .count-badge { background: #f3f4f6; color: #6b7280; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 8px; }
+
+  @media (max-width: 600px) {
+    .topbar, .tabs, .search-bar, .grid { padding-left: 14px; padding-right: 14px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <h1>🪪 KYC Verification</h1>
+    <p>Delight Admin Panel</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="count-badge" id="countBadge">0 sellers</span>
+    <button class="refresh-btn" onclick="loadKYC()">↻ Refresh</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('pending')"  id="tab-pending">Pending</button>
+  <button class="tab"        onclick="switchTab('approved')" id="tab-approved">Approved</button>
+  <button class="tab"        onclick="switchTab('rejected')" id="tab-rejected">Rejected</button>
+  <button class="tab"        onclick="switchTab('all')"      id="tab-all">All</button>
+</div>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Search by name, phone, or business name..." oninput="renderCards()" />
+</div>
+
+<!-- GRID -->
+<div class="grid" id="grid"></div>
+
+<!-- IMAGE MODAL -->
+<div class="modal-bg" id="imgModal" onclick="closeModal()">
+  <button class="modal-close" onclick="closeModal()">✕</button>
+  <img class="modal-img" id="modalImg" src="" alt="CNIC" onclick="event.stopPropagation()" />
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const BASE_URL = "https://delight-backend--araindaniyalo2.replit.app"; // 🔁 apna backend URL yahan lagao
+// ──────────────────────────────────────────────────────────
+
+let allSellers = [];
+let currentTab = "pending";
+let actionLoading = null;
+
+// ── FETCH ─────────────────────────────────────────────────
+async function loadKYC() {
+  showGrid('<div class="state-box"><div class="spinner"></div><p class="state-title">Loading KYC requests...</p></div>');
+  try {
+    const url = currentTab === "all"
+      ? `${BASE_URL}/admin/kyc-requests`
+      : `${BASE_URL}/admin/kyc-requests?status=${currentTab}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.success) {
+      allSellers = data.requests || [];
+      renderCards();
+    } else {
+      showGrid(`<div class="state-box"><div class="state-icon">⚠️</div><p class="state-title">${data.message || "Failed to load"}</p></div>`);
+    }
+  } catch(e) {
+    showGrid(`<div class="state-box"><div class="state-icon">🔌</div><p class="state-title">Cannot connect to backend</p><p class="state-sub">Check BASE_URL in the script</p></div>`);
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function renderCards() {
+  const q = document.getElementById("searchInput").value.toLowerCase();
+  const list = allSellers.filter(s =>
+    (s.name || "").toLowerCase().includes(q) ||
+    (s.phone || "").includes(q) ||
+    (s.kyc?.businessName || "").toLowerCase().includes(q)
+  );
+
+  document.getElementById("countBadge").textContent = `${list.length} seller${list.length !== 1 ? "s" : ""}`;
+
+  if (list.length === 0) {
+    showGrid(`<div class="state-box"><div class="state-icon">🪪</div><p class="state-title">No ${currentTab === "all" ? "" : currentTab} KYC requests</p><p class="state-sub">New submissions will appear here</p></div>`);
+    return;
+  }
+
+  document.getElementById("grid").innerHTML = list.map(s => cardHTML(s)).join("");
+}
+
+function showGrid(html) {
+  document.getElementById("grid").innerHTML = `<div style="grid-column:1/-1">${html}</div>`;
+}
+
+// ── CARD HTML ─────────────────────────────────────────────
+function cardHTML(s) {
+  const k = s.kyc || {};
+  const status = k.status || "not_submitted";
+  const initials = (s.name || "S").charAt(0).toUpperCase();
+
+  const badgeClass = `badge badge-${status}`;
+  const labelMap = { pending:"Pending", approved:"Approved", rejected:"Rejected", not_submitted:"Not Submitted" };
+
+  const cnicFront = k.cnicFront
+    ? `<div class="cnic-box" onclick="openModal('${k.cnicFront}')"><img src="${k.cnicFront}" /><div class="cnic-overlay"><span>Full View</span></div><div class="cnic-label">CNIC Front</div></div>`
+    : `<div class="cnic-empty">No Front</div>`;
+
+  const cnicBack = k.cnicBack
+    ? `<div class="cnic-box" onclick="openModal('${k.cnicBack}')"><img src="${k.cnicBack}" /><div class="cnic-overlay"><span>Full View</span></div><div class="cnic-label">CNIC Back</div></div>`
+    : `<div class="cnic-empty">No Back</div>`;
+
+  const submittedLine = k.submittedAt
+    ? `<p class="submitted-at">Submitted: ${new Date(k.submittedAt).toLocaleString("en-PK", {day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}</p>`
+    : "";
+
+  const rejectNote = k.rejectedReason
+    ? `<div class="reject-note"><p class="reject-note-label">Rejection Reason:</p><p class="reject-note-text">${k.rejectedReason}</p></div>`
+    : "";
+
+  let footer = "";
+  if (status === "pending") {
+    footer = `
+      <div class="card-footer" id="footer-${s.phone}">
+        <div class="btn-row">
+          <button class="btn btn-approve" onclick="doApprove('${s.phone}')">✓ Approve</button>
+          <button class="btn btn-reject"  onclick="showRejectBox('${s.phone}')">✕ Reject</button>
+        </div>
+      </div>`;
+  } else if (status === "approved") {
+    footer = `<div class="card-footer"><div class="approved-banner">✓ KYC Verified & Approved</div></div>`;
+  } else if (status === "rejected") {
+    footer = `<div class="card-footer"><button class="btn-reapprove" onclick="doApprove('${s.phone}')">↩ Re-Approve KYC</button></div>`;
+  }
+
+  return `
+  <div class="card" id="card-${s.phone}">
+    <div class="card-header">
+      <div style="display:flex;align-items:center;">
+        <div class="avatar">${initials}</div>
+        <div class="seller-info">
+          <div class="seller-name">${s.name || "—"}</div>
+          <div class="seller-phone">${s.phone}</div>
+        </div>
+      </div>
+      <span class="${badgeClass}"><span class="badge-dot"></span>${labelMap[status]}</span>
+    </div>
+    <div class="card-body">
+      <div class="info-row">
+        <div class="info-box"><div class="info-label">Full Name</div><div class="info-value">${k.businessName || "—"}</div></div>
+        <div class="info-box"><div class="info-label">Phone Number</div><div class="info-value">${k.phone || "—"}</div></div>
+      </div>
+      ${submittedLine}
+      ${rejectNote}
+      <div class="cnic-row">${cnicFront}${cnicBack}</div>
+    </div>
+    ${footer}
+  </div>`;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+async function doApprove(phone) {
+  if (actionLoading) return;
+  actionLoading = phone;
+  setBtnLoading(phone, true);
+  try {
+    const res = await fetch(`${BASE_URL}/admin/verify-kyc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    const data = await res.json();
+    if (data.success) { showToast(data.message, "success"); loadKYC(); }
+    else showToast(data.message || "Failed", "error");
+  } catch { showToast("Network error", "error"); }
+  actionLoading = null;
+  setBtnLoading(phone, false);
+}
+
+function showRejectBox(phone) {
+  const footer = document.getElementById(`footer-${phone}`);
+  if (!footer) return;
+  footer.innerHTML = `
+    <textarea class="reject-input" id="reason-${phone}" rows="2" placeholder="Enter rejection reason..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-confirm" onclick="doReject('${phone}')">Confirm Reject</button>
+      <button class="btn-cancel" onclick="cancelReject('${phone}')">Cancel</button>
+    </div>`;
+}
+
+function cancelReject(phone) {
+  const footer = document.getElementById(`footer-${phone}`);
+  footer.innerHTML = `
+    <div class="btn-row">
+      <button class="btn btn-approve" onclick="doApprove('${phone}')">✓ Approve</button>
+      <button class="btn btn-reject"  onclick="showRejectBox('${phone}')">✕ Reject</button>
+    </div>`;
+}
+
+async function doReject(phone) {
+  const reason = document.getElementById(`reason-${phone}`)?.value?.trim();
+  if (!reason) { alert("Please enter a rejection reason."); return; }
+  if (actionLoading) return;
+  actionLoading = phone;
+  try {
+    const res = await fetch(`${BASE_URL}/admin/reject-kyc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, reason }),
+    });
+    const data = await res.json();
+    if (data.success) { showToast(data.message, "success"); loadKYC(); }
+    else showToast(data.message || "Failed", "error");
+  } catch { showToast("Network error", "error"); }
+  actionLoading = null;
+}
+
+function setBtnLoading(phone, loading) {
+  const card = document.getElementById(`card-${phone}`);
+  if (!card) return;
+  card.querySelectorAll("button").forEach(b => b.disabled = loading);
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(`tab-${tab}`).classList.add("active");
+  loadKYC();
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal(src) {
+  document.getElementById("modalImg").src = src;
+  document.getElementById("imgModal").classList.add("open");
+}
+function closeModal() {
+  document.getElementById("imgModal").classList.remove("open");
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = "success") {
+  const el = document.getElementById("toast");
+  el.textContent = (type === "success" ? "✓ " : "✕ ") + msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+loadKYC();
+</script>
+</body>
+</html>
