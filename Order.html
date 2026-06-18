@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ff6b00">
+<title>Admin Orders - Delightpk</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+:root{
+  --bg-body:#f0f2f5;--bg-card:#fff;--text-primary:#1f2937;--text-secondary:#6b7280;
+  --text-muted:#9ca3af;--accent:#ff6b00;--accent-hover:#e55a00;--border:#e5e7eb;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.12);--radius:12px;--radius-sm:8px;
+}
+[data-theme="dark"]{
+  --bg-body:#0f0f1a;--bg-card:#1a1a2e;--text-primary:#f3f4f6;--text-secondary:#a1a1aa;
+  --text-muted:#71717a;--border:#2a2a4a;
+  --shadow:0 1px 3px rgba(0,0,0,0.3),0 4px 12px rgba(0,0,0,0.2);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.4);
+}
+body{background:var(--bg-body);color:var(--text-primary);min-height:100vh;}
+
+/* TOP BAR */
+.top-bar{
+  background:var(--bg-card);border-bottom:1px solid var(--border);
+  padding:14px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:var(--shadow);
+}
+.top-bar h1{font-size:18px;font-weight:800;color:var(--accent);}
+.top-bar-right{display:flex;align-items:center;gap:10px;}
+.search-box{
+  display:flex;align-items:center;gap:8px;background:var(--bg-body);
+  border:1px solid var(--border);border-radius:8px;padding:8px 14px;min-width:220px;
+}
+.search-box input{border:none;background:none;outline:none;font-size:13px;color:var(--text-primary);width:100%;}
+.search-box i{color:var(--text-muted);font-size:13px;}
+.icon-btn{
+  width:38px;height:38px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text-secondary);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:15px;transition:all 0.2s;
+}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:24px 28px 0;}
+.stat-card{
+  background:var(--bg-card);border-radius:var(--radius);padding:20px;
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;transition:transform 0.2s;
+}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-icon{
+  width:52px;height:52px;border-radius:12px;display:flex;
+  align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+}
+.stat-icon.orange{background:#fff7ed;color:var(--accent);}
+.stat-icon.blue{background:#eff6ff;color:#3b82f6;}
+.stat-icon.green{background:#f0fdf4;color:#22c55e;}
+.stat-icon.purple{background:#faf5ff;color:#a855f7;}
+.stat-info h3{font-size:26px;font-weight:800;color:var(--text-primary);line-height:1;}
+.stat-info p{font-size:13px;color:var(--text-secondary);margin-top:4px;}
+.stat-trend{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:6px;display:inline-block;}
+.stat-trend.up{background:#dcfce7;color:#16a34a;}
+.stat-trend.down{background:#fff3cd;color:#92400e;}
+
+/* FILTERS */
+.filter-section{padding:20px 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-chip{
+  padding:7px 16px;border:1px solid var(--border);border-radius:20px;
+  background:var(--bg-card);color:var(--text-secondary);font-size:13px;
+  font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;
+}
+.filter-chip:hover{border-color:var(--accent);color:var(--accent);}
+.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.filter-chip .count{background:rgba(0,0,0,0.1);padding:1px 7px;border-radius:10px;font-size:11px;}
+.filter-chip.active .count{background:rgba(255,255,255,0.25);}
+
+/* TABLE */
+.table-container{
+  margin:0 28px 28px;background:var(--bg-card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;
+}
+.table-header{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.table-header h3{font-size:16px;font-weight:700;}
+.table-header-btns{display:flex;gap:8px;}
+.export-btn{
+  background:var(--accent);color:#fff;border:none;padding:8px 16px;
+  border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:all 0.2s;
+}
+.export-btn:hover{background:var(--accent-hover);}
+.refresh-btn{
+  background:var(--bg-body);color:var(--text-secondary);border:1px solid var(--border);
+  padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s;
+}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--bg-body);}
+th{
+  padding:13px 14px;text-align:left;font-size:11px;font-weight:700;
+  color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;
+  border-bottom:1px solid var(--border);white-space:nowrap;
+}
+td{padding:14px;font-size:14px;border-bottom:1px solid var(--border);vertical-align:top;}
+tbody tr:hover{background:var(--bg-body);}
+tbody tr:last-child td{border-bottom:none;}
+
+/* CELLS */
+.order-info{display:flex;flex-direction:column;gap:3px;}
+.order-id{font-weight:700;font-size:14px;}
+.order-date{font-size:12px;color:var(--text-muted);}
+
+.product-cell{display:flex;align-items:center;gap:10px;}
+.product-img{
+  width:46px;height:46px;border-radius:8px;object-fit:cover;
+  border:1px solid var(--border);background:var(--bg-body);flex-shrink:0;
+}
+.product-title{font-weight:600;font-size:13px;max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.product-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+.buyer-cell{display:flex;flex-direction:column;gap:3px;}
+.buyer-name{font-weight:600;font-size:13px;}
+.buyer-phone{font-size:11px;color:var(--text-muted);}
+.buyer-address{font-size:11px;color:var(--text-muted);max-width:150px;line-height:1.5;}
+
+.seller-cell{display:flex;align-items:center;gap:9px;}
+.seller-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#ff3d00);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:700;font-size:13px;flex-shrink:0;
+}
+.seller-name{font-weight:600;font-size:13px;}
+.seller-phone{font-size:11px;color:var(--text-muted);}
+
+.amount-main{font-weight:800;font-size:15px;}
+.amount-breakdown{font-size:11px;color:var(--text-muted);line-height:1.6;margin-top:3px;}
+
+/* BADGES */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 10px;
+  border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;white-space:nowrap;
+}
+.badge-pending{background:#fff3cd;color:#92400e;}
+.badge-shipped{background:#cce5ff;color:#1e40af;}
+.badge-delivered{background:#d4edda;color:#166534;}
+.badge-cancelled{background:#f8d7da;color:#991b1b;}
+.badge-processing{background:#e0e7ff;color:#3730a3;}
+
+.payment-type{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;margin-bottom:4px;}
+.payment-type.advance{color:#3730a3;}
+.payment-type.cod{color:#6b7280;}
+
+/* STATUS SELECT */
+.status-select{
+  margin-top:7px;padding:5px 9px;border:1px solid var(--border);border-radius:6px;
+  background:var(--bg-card);color:var(--text-primary);font-size:11px;
+  font-family:'Poppins',sans-serif;cursor:pointer;outline:none;display:block;
+}
+.status-select:focus{border-color:var(--accent);}
+
+/* ACTION BUTTONS */
+.action-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.action-btn{
+  padding:5px 9px;border:none;border-radius:6px;font-size:11px;
+  font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px;
+  transition:all 0.2s;white-space:nowrap;font-family:'Poppins',sans-serif;
+}
+.action-btn:hover{transform:scale(1.05);}
+.btn-view{background:#eff6ff;color:#2563eb;}
+.btn-invoice{background:#fff7ed;color:var(--accent);}
+.btn-verify{background:#f0fdf4;color:#16a34a;}
+.btn-reject{background:#fef2f2;color:#dc2626;}
+.btn-send{background:linear-gradient(135deg,var(--accent),#ff3d00);color:#fff;}
+.btn-send:hover{box-shadow:0 4px 12px rgba(255,107,0,0.35);}
+
+/* PROOF ROW */
+.proof-row{display:none;}
+.proof-row.active{display:table-row;}
+.proof-row>td{padding:0;border-bottom:2px solid var(--accent);}
+.proof-content{
+  padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  background:var(--bg-body);
+}
+.proof-card{background:var(--bg-card);border-radius:var(--radius-sm);padding:16px;border:1px solid var(--border);}
+.proof-card h4{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.proof-card h4 i{color:var(--accent);}
+.proof-row-item{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px;
+}
+.proof-row-item:last-of-type{border-bottom:none;}
+.proof-row-item span{color:var(--text-secondary);flex-shrink:0;}
+.proof-row-item strong{color:var(--text-primary);text-align:right;word-break:break-all;}
+.proof-img{
+  width:100%;max-height:190px;object-fit:contain;border-radius:8px;
+  border:1px solid var(--border);cursor:pointer;margin-top:12px;transition:opacity 0.2s;
+}
+.proof-img:hover{opacity:0.85;}
+.no-screenshot{
+  margin-top:12px;padding:18px;text-align:center;background:var(--bg-body);
+  border-radius:8px;color:var(--text-muted);font-size:12px;border:1px dashed var(--border);
+}
+
+/* ADMIN ACTIONS */
+.admin-panel{
+  background:linear-gradient(135deg,#1a1a2e,#252542);color:#fff;
+  border-radius:var(--radius-sm);padding:16px;
+}
+.admin-panel h4{font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent);display:flex;align-items:center;gap:7px;}
+.admin-panel p{font-size:12px;color:#a0a0c0;margin-bottom:12px;line-height:1.6;}
+.admin-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.admin-btn{
+  padding:9px;border:1px solid rgba(255,255,255,0.15);border-radius:8px;
+  background:rgba(255,255,255,0.05);color:#fff;font-size:12px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all 0.2s;font-family:'Poppins',sans-serif;
+}
+.admin-btn:hover{background:rgba(255,255,255,0.1);border-color:var(--accent);}
+.admin-btn.approve{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,0.35);color:#4ade80;}
+.admin-btn.approve:hover{background:rgba(34,197,94,0.25);}
+.admin-btn.reject-b{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.35);color:#f87171;}
+.admin-btn.reject-b:hover{background:rgba(239,68,68,0.25);}
+.admin-btn.send-b{background:rgba(255,107,0,0.15);border-color:rgba(255,107,0,0.35);color:#fb923c;}
+.admin-btn.send-b:hover{background:rgba(255,107,0,0.25);}
+
+/* EMPTY & LOADING */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state i{font-size:52px;color:var(--border);margin-bottom:16px;display:block;}
+.empty-state h3{font-size:17px;color:var(--text-secondary);margin-bottom:6px;}
+.empty-state p{font-size:13px;color:var(--text-muted);}
+
+.loading-skel{padding:24px;display:flex;flex-direction:column;gap:16px;}
+.skel-row{display:flex;gap:14px;align-items:center;}
+.skel{
+  background:linear-gradient(90deg,var(--bg-body) 25%,var(--border) 50%,var(--bg-body) 75%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;
+}
+.skel.sq{width:46px;height:46px;flex-shrink:0;border-radius:8px;}
+.skel.h{height:14px;}
+.skel.h12{height:12px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* MODAL */
+.modal-overlay{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:1000;
+  justify-content:center;align-items:center;padding:20px;
+}
+.modal-overlay.active{display:flex;}
+.modal-box{
+  background:var(--bg-card);border-radius:var(--radius);max-width:500px;width:100%;
+  box-shadow:var(--shadow-lg);overflow:hidden;animation:mSlide 0.25s ease;
+}
+@keyframes mSlide{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.modal-close{background:none;border:none;font-size:22px;color:var(--text-muted);cursor:pointer;padding:2px 6px;}
+.modal-close:hover{color:var(--text-primary);}
+.modal-body{padding:20px;max-height:68vh;overflow-y:auto;}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+.modal-btn{
+  padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.2s;font-family:'Poppins',sans-serif;
+  display:flex;align-items:center;gap:6px;
+}
+.modal-btn.sec{background:var(--bg-body);color:var(--text-secondary);border:1px solid var(--border);}
+.modal-btn.sec:hover{border-color:var(--accent);color:var(--accent);}
+.modal-btn.pri{background:var(--accent);color:#fff;}
+.modal-btn.pri:hover{background:var(--accent-hover);}
+
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px;}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:9px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--bg-body);color:var(--text-primary);font-size:13px;outline:none;
+  font-family:'Poppins',sans-serif;transition:border-color 0.2s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);}
+.form-group input[readonly]{opacity:0.6;cursor:not-allowed;}
+
+/* INVOICE DETAIL */
+.inv-row{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;gap:8px;}
+.inv-row:last-child{border-bottom:none;}
+.inv-row span{color:var(--text-secondary);}
+.inv-row strong{color:var(--text-primary);text-align:right;word-break:break-all;}
+
+/* TOAST */
+.toast-wrap{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:9px;pointer-events:none;}
+.toast{
+  background:var(--bg-card);border-left:4px solid var(--accent);padding:13px 18px;
+  border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:9px;font-size:13px;font-weight:500;
+  animation:tIn 0.3s ease;min-width:270px;max-width:360px;pointer-events:all;
+}
+.toast.success{border-left-color:#22c55e;}
+.toast.error{border-left-color:#dc2626;}
+.toast i{font-size:15px;flex-shrink:0;}
+.toast.success i{color:#22c55e;}
+.toast.error i{color:#dc2626;}
+.toast span{color:var(--text-primary);line-height:1.4;}
+@keyframes tIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes tOut{from{transform:translateX(0);opacity:1}to{transform:translateX(110%);opacity:0}}
+.toast.out{animation:tOut 0.3s ease forwards;}
+
+/* RESPONSIVE */
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){
+  .top-bar{padding:12px 16px;}
+  .search-box{min-width:130px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);padding:12px 16px 0;gap:12px;}
+  .stat-card{padding:14px;}
+  .stat-icon{width:44px;height:44px;font-size:18px;}
+  .stat-info h3{font-size:20px;}
+  .filter-section{padding:12px 16px;gap:7px;}
+  .filter-chip{padding:5px 12px;font-size:12px;}
+  .table-container{margin:0 12px 16px;overflow-x:auto;}
+  table{min-width:840px;}
+  .proof-content{grid-template-columns:1fr;padding:12px;}
+  td{padding:11px;font-size:12px;}
+  th{padding:10px 11px;font-size:10px;}
+}
+@media(max-width:480px){
+  .stat-card{flex-direction:column;text-align:center;gap:8px;padding:12px;}
+  .stat-info h3{font-size:18px;}
+  .admin-btn-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <h1><i class="fas fa-store" style="margin-right:7px;"></i>Delightpk Control Room</h1>
+  <div class="top-bar-right">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search orders..." oninput="handleSearch()">
+    </div>
+    <button class="icon-btn" onclick="toggleDark()" title="Dark Mode">
+      <i id="darkIcon" class="fas fa-moon"></i>
+    </button>
+    <button class="icon-btn" onclick="doRefresh()" title="Refresh">
+      <i id="refreshIcon" class="fas fa-sync-alt"></i>
+    </button>
+  </div>
+</div>
+
+<main>
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon orange"><i class="fas fa-shopping-bag"></i></div>
+      <div class="stat-info">
+        <h3 id="sTot">—</h3><p>Total Orders</p>
+        <span class="stat-trend up"><i class="fas fa-infinity"></i> All Time</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="fas fa-credit-card"></i></div>
+      <div class="stat-info">
+        <h3 id="sAdv">—</h3><p>Advance Payments</p>
+        <span class="stat-trend down"><i class="fas fa-clock"></i> Need Verification</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info">
+        <h3 id="sRev">—</h3><p>Verified Revenue</p>
+        <span class="stat-trend up"><i class="fas fa-arrow-up"></i> Confirmed Only</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple"><i class="fas fa-truck"></i></div>
+      <div class="stat-info">
+        <h3 id="sPend">—</h3><p>Pending Orders</p>
+        <span class="stat-trend down"><i class="fas fa-exclamation"></i> Action Needed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-section">
+    <div class="filter-chip active" onclick="setFilter('all',this)"><i class="fas fa-th-large"></i> All <span class="count" id="cAll">0</span></div>
+    <div class="filter-chip" onclick="setFilter('Pending',this)"><i class="fas fa-clock"></i> Pending <span class="count" id="cPend">0</span></div>
+    <div class="filter-chip" onclick="setFilter('Shipped',this)"><i class="fas fa-shipping-fast"></i> Shipped <span class="count" id="cShip">0</span></div>
+    <div class="filter-chip" onclick="setFilter('Delivered',this)"><i class="fas fa-check"></i> Delivered <span class="count" id="cDel">0</span></div>
+    <div class="filter-chip" onclick="setFilter('Cancelled',this)"><i class="fas fa-times"></i> Cancelled <span class="count" id="cCan">0</span></div>
+    <div class="filter-chip" onclick="setFilter('advance',this)" style="border-color:#3730a3;color:#3730a3;"><i class="fas fa-credit-card"></i> Advance <span class="count" id="cAdv">0</span></div>
+    <div class="filter-chip" onclick="setFilter('cod',this)" style="border-color:#6b7280;color:#6b7280;"><i class="fas fa-money-bill"></i> COD <span class="count" id="cCOD">0</span></div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-container">
+    <div class="table-header">
+      <h3><i class="fas fa-list" style="color:var(--accent);margin-right:8px;"></i>Order List</h3>
+      <div class="table-header-btns">
+        <button class="refresh-btn" onclick="doRefresh()"><i class="fas fa-sync-alt"></i> Refresh</button>
+        <button class="export-btn" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+    </div>
+    <div id="tableContent"></div>
+  </div>
+</main>
+
+<!-- SEND PAYMENT MODAL -->
+<div class="modal-overlay" id="sendModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3><i class="fas fa-paper-plane" style="color:var(--accent);"></i> Seller ko Payment Bhejein</h3>
+      <button class="modal-close" onclick="closeSendModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Order ID</label><input type="text" id="mOrdId" readonly></div>
+      <div class="form-group"><label>Seller Name</label><input type="text" id="mSellName" readonly></div>
+      <div class="form-group"><label>Seller Phone</label><input type="text" id="mSellPhone" readonly></div>
+      <div class="form-group"><label>Buyer ne Kiya Bheja</label><input type="text" id="mBuyerAmt" readonly></div>
+      <div class="form-group"><label>Send Amount (Rs.)</label><input type="number" id="mAmt" placeholder="Amount enter karein"></div>
+      <div class="form-group"><label>Payment Method</label>
+        <select id="mMethod">
+          <option value="easypaisa">EasyPaisa</option>
+          <option value="jazzcash">JazzCash</option>
+          <option value="bank">Bank Transfer</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Transaction ID</label><input type="text" id="mTxn" placeholder="Apna transaction ID"></div>
+      <div class="form-group"><label>Notes (Optional)</label><textarea id="mNotes" rows="3" placeholder="Koi note..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn sec" onclick="closeSendModal()">Cancel</button>
+      <button class="modal-btn pri" onclick="confirmSend()"><i class="fas fa-paper-plane"></i> Confirm Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div class="modal-overlay" id="imgModal" onclick="closeImgModal()">
+  <div style="position:relative;max-width:92%;max-height:92%;" onclick="event.stopPropagation()">
+    <button class="modal-close" style="position:absolute;top:-42px;right:0;color:#fff;font-size:30px;" onclick="closeImgModal()">&times;</button>
+    <img id="bigImg" src="" style="max-width:100%;max-height:85vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);display:block;" alt="Proof">
+  </div>
+</div>
+
+<script>
+const API = "https://delight-backend--araindaniyalo2.replit.app";
+let orders=[], payments=[], sellers=[], curFilter='all', searchQ='', sendOrdId=null, busy=false;
+
+// ── DARK MODE ──────────────────────────────
+function toggleDark(){
+  const d=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',d?'light':'dark');
+  localStorage.setItem('dpDark',d?'0':'1');
+  document.getElementById('darkIcon').className=d?'fas fa-moon':'fas fa-sun';
+}
+if(localStorage.getItem('dpDark')==='1'){
+  document.documentElement.setAttribute('data-theme','dark');
+  document.getElementById('darkIcon').className='fas fa-sun';
+}
+
+// ── TOAST ──────────────────────────────────
+function toast(msg,type='success'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i><span>${msg}</span>`;
+  w.appendChild(t);
+  setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300);},3500);
+}
+
+// ── LOAD DATA ──────────────────────────────
+async function loadData(){
+  if(busy)return;
+  busy=true;
+  showSkel();
+  try{
+    const [oRes,sRes]=await Promise.all([
+      fetch(`${API}/admin/orders`),
+      fetch(`${API}/all-stores`)
+    ]);
+    if(!oRes.ok||!sRes.ok) throw new Error('API error');
+    const oData=await oRes.json();
+    const sData=await sRes.json();
+
+    // /admin/orders returns a plain array
+    orders=Array.isArray(oData)?oData:(oData.orders||[]);
+    // /all-stores returns a plain array
+    sellers=Array.isArray(sData)?sData:[];
+
+    // load payments per unique seller phone
+    payments=[];
+    const phones=[...new Set(orders.map(o=>o.sellerPhone).filter(Boolean))];
+    await Promise.all(phones.map(async ph=>{
+      try{
+        const r=await fetch(`${API}/seller/payments/${ph}`);
+        if(r.ok){
+          const d=await r.json();
+          if(d.success&&Array.isArray(d.payments)) payments=payments.concat(d.payments);
+        }
+      }catch(e){}
+    }));
+
+    updateStats(); renderTable();
+  }catch(e){
+    console.error(e);
+    toast('API unreachable — demo data dikh raha hai','error');
+    demoData();
+  }finally{
+    busy=false;
+    document.getElementById('refreshIcon').classList.remove('fa-spin');
+  }
+}
+
+function showSkel(){
+  document.getElementById('tableContent').innerHTML=`
+    <div class="loading-skel">
+      ${[1,2,3,4].map(()=>`
+        <div class="skel-row">
+          <div class="skel sq"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+            <div class="skel h" style="width:55%;"></div>
+            <div class="skel h12" style="width:38%;"></div>
+          </div>
+          <div class="skel h" style="width:80px;"></div>
+          <div class="skel h" style="width:65px;"></div>
+          <div class="skel h" style="width:75px;"></div>
+        </div>`).join('')}
+    </div>`;
+}
+// ── HELPERS ────────────────────────────────
+function getSeller(phone){
+  return sellers.find(s=>s.phone===phone)||{name:phone||'Unknown',phone:phone||''};
+}
+function getPayment(orderId){
+  return payments.find(p=>Number(p.orderId)===Number(orderId))||null;
+}
+// KEY FIX: properly parse product from backend
+// Backend stores order.product as productData which has: title, price, delivery, qty/quantity, images[]
+function parseProd(raw){
+  if(!raw) return{title:'Unknown',price:0,delivery:0,qty:1,img:''};
+  return{
+    title: raw.title||raw.name||'Unknown Product',
+    price: Number(raw.price)||0,
+    delivery: Number(raw.delivery)||0,
+    qty: Number(raw.qty)||Number(raw.quantity)||1,
+    // images[] array (stored as imageUrls or images), fallback to single image field
+    img: (Array.isArray(raw.images)&&raw.images.length>0) ? raw.images[0]
+       : (Array.isArray(raw.imageUrls)&&raw.imageUrls.length>0) ? raw.imageUrls[0]
+       : (raw.image||raw.imageUrl||'')
+  };
+}
+function fmtDate(s){
+  if(!s)return{d:'N/A',t:''};
+  const dt=new Date(s);
+  if(isNaN(dt))return{d:'N/A',t:''};
+  return{
+    d:dt.toLocaleDateString('en-PK',{day:'numeric',month:'short',year:'numeric'}),
+    t:dt.toLocaleTimeString('en-PK',{hour:'2-digit',minute:'2-digit'})
+  };
+}
+
+// ── STATS ──────────────────────────────────
+function updateStats(){
+  const tot=orders.length;
+  const advOrds=orders.filter(o=>getPayment(o.id));
+  const verRev=payments.filter(p=>p.status==='verified').reduce((s,p)=>s+Number(p.amount||0),0);
+  const pend=orders.filter(o=>o.status==='Pending').length;
+  document.getElementById('sTot').textContent=tot;
+  document.getElementById('sAdv').textContent=advOrds.length;
+  document.getElementById('sRev').textContent='Rs. '+verRev.toLocaleString();
+  document.getElementById('sPend').textContent=pend;
+  document.getElementById('cAll').textContent=tot;
+  document.getElementById('cPend').textContent=pend;
+  document.getElementById('cShip').textContent=orders.filter(o=>o.status==='Shipped').length;
+  document.getElementById('cDel').textContent=orders.filter(o=>o.status==='Delivered').length;
+  document.getElementById('cCan').textContent=orders.filter(o=>o.status==='Cancelled').length;
+  document.getElementById('cAdv').textContent=advOrds.length;
+  document.getElementById('cCOD').textContent=tot-advOrds.length;
+}
+
+// ── FILTER / SEARCH ────────────────────────
+function setFilter(f,el){
+  curFilter=f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderTable();
+}
+function handleSearch(){
+  searchQ=document.getElementById('searchInput').value.trim().toLowerCase();
+  renderTable();
+}
+function doRefresh(){
+  document.getElementById('refreshIcon').classList.add('fa-spin');
+  orders=[];payments=[];sellers=[];
+  loadData();
+}
+
+// ── RENDER TABLE ───────────────────────────
+function renderTable(){
+  const el=document.getElementById('tableContent');
+  let list=[...orders];
+
+  if(curFilter==='advance') list=list.filter(o=>getPayment(o.id));
+  else if(curFilter==='cod') list=list.filter(o=>!getPayment(o.id));
+  else if(curFilter!=='all') list=list.filter(o=>o.status===curFilter);
+
+  if(searchQ){
+    list=list.filter(o=>{
+      const s=getSeller(o.sellerPhone);
+      const p=parseProd(o.product);
+      return String(o.id).includes(searchQ)
+        ||(o.buyerName||'').toLowerCase().includes(searchQ)
+        ||(o.buyerPhone||'').includes(searchQ)
+        ||(s.name||'').toLowerCase().includes(searchQ)
+        ||(o.sellerPhone||'').includes(searchQ)
+        ||p.title.toLowerCase().includes(searchQ)
+        ||(o.address||'').toLowerCase().includes(searchQ);
+    });
+  }
+
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state"><i class="fas fa-inbox"></i><h3>Koi order nahi mila</h3><p>Filter ya search change karein</p></div>`;
+    return;
+  }
+
+  const sMap={Pending:'badge-pending',Shipped:'badge-shipped',Delivered:'badge-delivered',Cancelled:'badge-cancelled',Processing:'badge-processing'};
+  let rows='';
+
+  list.forEach(ord=>{
+    const prod=parseProd(ord.product);
+    const sell=getSeller(ord.sellerPhone);
+    const pay=getPayment(ord.id);
+    const dt=fmtDate(ord.createdAt);
+    const total=prod.price*prod.qty+prod.delivery;
+    const sBadge=sMap[ord.status]||'badge-pending';
+    const imgSrc=prod.img||'https://via.placeholder.com/46x46?text=?';
+
+    // payment badge
+    let payBadge='';
+    if(pay){
+      const pc=pay.status==='verified'?'badge-delivered':pay.status==='rejected'?'badge-cancelled':'badge-pending';
+      payBadge=`<span class="badge ${pc}" style="margin-top:4px;">${pay.status}</span>`;
+    }
+
+    // actions
+    let acts=`<button class="action-btn btn-view" onclick="toggleProof(${ord.id})" title="Details"><i class="fas fa-eye"></i></button>`;
+    if(pay){
+      acts+=`<button class="action-btn btn-invoice" onclick="showInvoice(${pay.id})" title="Invoice"><i class="fas fa-file-invoice"></i></button>`;
+      if(pay.status==='pending'){
+        acts+=`<button class="action-btn btn-verify" onclick="verifyPay(${pay.id},'approve')"><i class="fas fa-check"></i></button>`;
+        acts+=`<button class="action-btn btn-reject" onclick="verifyPay(${pay.id},'reject')"><i class="fas fa-times"></i></button>`;
+      }
+      if(pay.status==='verified'){
+        acts+=`<button class="action-btn btn-send" onclick="openSend(${ord.id})"><i class="fas fa-paper-plane"></i> Send</button>`;
+      }
+    }
+
+    rows+=`
+      <tr>
+        <td><div class="order-info">
+          <span class="order-id">#${ord.id}</span>
+          <span class="order-date">${dt.d}</span>
+          <span class="order-date">${dt.t}</span>
+        </div></td>
+        <td><div class="product-cell">
+          <img src="${imgSrc}" class="product-img" alt="product" onerror="this.src='https://via.placeholder.com/46x46?text=?'">
+          <div>
+            <div class="product-title" title="${prod.title}">${prod.title}</div>
+            <div class="product-meta">Qty: ${prod.qty} | Rs. ${prod.price.toLocaleString()} each</div>
+          </div>
+        </div></td>
+        <td><div class="buyer-cell">
+          <span class="buyer-name">${ord.buyerName||'N/A'}</span>
+          <span class="buyer-phone"><i class="fas fa-phone" style="font-size:9px;margin-right:3px;"></i>${ord.buyerPhone||'N/A'}</span>
+          <span class="buyer-address">${ord.address||'—'}</span>
+        </div></td>
+        <td><div class="seller-cell">
+          <div class="seller-avatar">${(sell.name||'S').charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="seller-name">${sell.name}</div>
+            <div class="seller-phone">${ord.sellerPhone||'N/A'}</div>
+          </div>
+        </div></td>
+        <td>
+          <div class="amount-main">Rs. ${total.toLocaleString()}</div>
+          <div class="amount-breakdown">
+            Product: Rs. ${(prod.price*prod.qty).toLocaleString()}<br>
+            Delivery: Rs. ${prod.delivery.toLocaleString()}
+          </div>
+        </td>
+        <td>
+          <div class="payment-type ${pay?'advance':'cod'}">
+            <i class="fas ${pay?'fa-credit-card':'fa-money-bill'}"></i>
+            <span>${pay?'Advance':'COD'}</span>
+          </div>
+          ${payBadge}
+        </td>
+        <td>
+          <span class="badge ${sBadge}">${ord.status}</span>
+          <select class="status-select" onchange="updateStatus(${ord.id},this.value)">
+            <option value="" disabled selected>Update</option>
+            <option value="Pending">Pending</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </td>
+        <td><div class="action-btns">${acts}</div></td>
+      </tr>`;
+
+    // proof row (only if advance payment exists)
+    if(pay){
+      const pc=pay.status==='verified'?'badge-delivered':pay.status==='rejected'?'badge-cancelled':'badge-pending';
+      const pdt=fmtDate(pay.submittedAt);
+      let adminBtns='';
+      if(pay.status==='pending'){
+        adminBtns=`
+          <button class="admin-btn approve" onclick="verifyPay(${pay.id},'approve')"><i class="fas fa-check-circle"></i> Verify</button>
+          <button class="admin-btn reject-b" onclick="verifyPay(${pay.id},'reject')"><i class="fas fa-times-circle"></i> Reject</button>`;
+      }else if(pay.status==='verified'){
+        adminBtns=`
+          <button class="admin-btn send-b" onclick="openSend(${ord.id})"><i class="fas fa-paper-plane"></i> Seller ko Bhejein</button>
+          <button class="admin-btn" onclick="showInvoice(${pay.id})"><i class="fas fa-file-invoice"></i> Invoice</button>`;
+      }else{
+        adminBtns=`
+          <button class="admin-btn" onclick="showInvoice(${pay.id})"><i class="fas fa-file-invoice"></i> Invoice</button>
+          <button class="admin-btn" onclick="window.open('tel:${ord.buyerPhone}')"><i class="fas fa-phone"></i> Buyer Contact</button>`;
+      }
+      const sshot=pay.screenshotUrl
+        ?`<img src="${pay.screenshotUrl}" class="proof-img" onclick="openImg('${pay.screenshotUrl}')" alt="Payment Proof">`
+        :`<div class="no-screenshot"><i class="fas fa-image" style="font-size:22px;display:block;margin-bottom:5px;"></i>Screenshot nahi</div>`;
+
+      rows+=`
+        <tr class="proof-row" id="proof-${ord.id}">
+          <td colspan="8"><div class="proof-content">
+            <div class="proof-card">
+              <h4><i class="fas fa-receipt"></i> Payment Details</h4>
+              <div class="proof-row-item"><span>Payment ID</span><strong>#${pay.id}</strong></div>
+              <div class="proof-row-item"><span>Method</span><strong>${(pay.paymentMethod||'N/A').toUpperCase()}</strong></div>
+              <div class="proof-row-item"><span>Amount</span><strong>Rs. ${(pay.amount||0).toLocaleString()}</strong></div>
+              <div class="proof-row-item"><span>Transaction ID</span><strong>${pay.transactionId||'N/A'}</strong></div>
+              <div class="proof-row-item"><span>Date</span><strong>${pdt.d} ${pdt.t}</strong></div>
+              <div class="proof-row-item"><span>Status</span><strong><span class="badge ${pc}">${(pay.status||'').toUpperCase()}</span></strong></div>
+              ${sshot}
+            </div>
+            <div class="admin-panel">
+              <h4><i class="fas fa-user-shield"></i> Admin Actions</h4>
+              <p><i class="fas fa-info-circle" style="margin-right:4px;"></i>Buyer ne advance payment ki hai. Verify karein aur seller ko transfer karein.</p>
+              <div class="admin-btn-grid">${adminBtns}</div>
+            </div>
+          </div></td>
+        </tr>`;
+    }
+  });
+
+  el.innerHTML=`
+    <table>
+      <thead><tr>
+        <th>Order Info</th><th>Product</th><th>Buyer</th><th>Seller</th>
+        <th>Amount</th><th>Payment</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── TOGGLE PROOF ROW ───────────────────────
+function toggleProof(id){
+  const row=document.getElementById(`proof-${id}`);
+  if(!row){toast('Is order mein advance payment nahi hai','error');return;}
+  document.querySelectorAll('.proof-row.active').forEach(r=>{if(r.id!==`proof-${id}`)r.classList.remove('active');});
+  row.classList.toggle('active');
+}
+
+// ── UPDATE STATUS ──────────────────────────
+async function updateStatus(ordId,newSt){
+  if(!newSt)return;
+  try{
+    const r=await fetch(`${API}/update-order/${ordId}`,{
+      method:'PUT',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({status:newSt})
+    });
+    const d=await r.json();
+    if(d.success){
+      const o=orders.find(x=>x.id===ordId);
+      if(o)o.status=newSt;
+      toast(`Order #${ordId} → ${newSt}`);
+      updateStats();renderTable();
+    }else toast(d.message||'Update failed','error');
+  }catch(e){
+    // demo fallback
+    const o=orders.find(x=>x.id===ordId);
+    if(o){o.status=newSt;toast(`Order #${ordId} → ${newSt} (demo)`);updateStats();renderTable();}
+  }
+}
+
+// ── VERIFY PAYMENT ─────────────────────────
+async function verifyPay(payId,action){
+  if(!confirm(`Payment ko ${action==='approve'?'verify':'reject'} karna chahte hain?`))return;
+  try{
+    const r=await fetch(`${API}/admin/payment/verify`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({paymentId:payId,action})
+    });
+    const d=await r.json();
+    if(d.success){toast(`Payment ${action==='approve'?'verified':'rejected'}!`);doRefresh();}
+    else toast(d.message||'Failed','error');
+  }catch(e){
+    // demo fallback
+    const p=payments.find(x=>x.id===payId);
+    if(p){p.status=action==='approve'?'verified':'rejected';toast(`Payment ${p.status} (demo)`);updateStats();renderTable();}
+  }
+}
+
+// ── SEND MODAL ─────────────────────────────
+function openSend(ordId){
+  const ord=orders.find(o=>o.id===ordId);if(!ord)return;
+  const pay=getPayment(ordId);
+  const sell=getSeller(ord.sellerPhone);
+  sendOrdId=ordId;
+  document.getElementById('mOrdId').value='#'+ordId;
+  document.getElementById('mSellName').value=sell.name||'Unknown';
+  document.getElementById('mSellPhone').value=ord.sellerPhone||'';
+  document.getElementById('mBuyerAmt').value=pay?'Rs. '+(pay.amount||0).toLocaleString():'N/A';
+  document.getElementById('mAmt').value=pay?pay.amount:'';
+  document.getElementById('mTxn').value='';
+  document.getElementById('mNotes').value='';
+  document.getElementById('sendModal').classList.add('active');
+}
+function closeSendModal(){
+  document.getElementById('sendModal').classList.remove('active');
+  sendOrdId=null;
+}
+function confirmSend(){
+  const amt=document.getElementById('mAmt').value.trim();
+  const txn=document.getElementById('mTxn').value.trim();
+  const method=document.getElementById('mMethod').value;
+  if(!amt||!txn){toast('Amount aur Transaction ID zaroori hain','error');return;}
+  toast(`Rs. ${Number(amt).toLocaleString()} seller ko ${method.toUpperCase()} se bhej diya! TXN: ${txn}`);
+  closeSendModal();
+}
+
+// ── INVOICE ────────────────────────────────
+async function showInvoice(payId){
+  let inv=null,demo=null;
+  try{
+    const r=await fetch(`${API}/invoice/${payId}`);
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    if(d.success)inv=d.invoice; else throw new Error();
+  }catch(e){
+    const pay=payments.find(p=>p.id===payId);
+    if(!pay){toast('Invoice nahi mili','error');return;}
+    const ord=orders.find(o=>Number(o.id)===Number(pay.orderId));
+    const sell=getSeller(pay.sellerPhone);
+    demo={pay,ord,sell};
+  }
+  buildInvoiceModal(inv,demo);
+}
+function buildInvoiceModal(inv,demo){
+  let num,amt,status,buyer,sellN,method,txn,date,sshot;
+  if(inv){
+    num=inv.invoiceNumber;amt=inv.payment.amount;status=inv.status;
+    buyer=inv.buyer.name;sellN=inv.seller.name;method=(inv.payment.method||'').toUpperCase();
+    txn=inv.payment.transactionId;date=new Date(inv.payment.submittedAt).toLocaleString('en-PK');
+    sshot=inv.payment.screenshotUrl;
+  }else{
+    const{pay,ord,sell}=demo;
+    num=`INV-${pay.id}`;amt=pay.amount;status=pay.status;
+    buyer=ord?.buyerName||pay.buyerName||'N/A';sellN=sell?.name||'N/A';
+    method=(pay.paymentMethod||'').toUpperCase();txn=pay.transactionId;
+    date=new Date(pay.submittedAt).toLocaleString('en-PK');sshot=pay.screenshotUrl;
+  }
+  const pc=status==='verified'?'badge-delivered':status==='rejected'?'badge-cancelled':'badge-pending';
+  const m=document.createElement('div');
+  m.className='modal-overlay active';m.style.zIndex='1001';
+  m.innerHTML=`
+    <div class="modal-box" style="max-width:450px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-invoice-dollar" style="color:var(--accent);"></i> ${num}</h3>
+        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align:center;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+          <div style="font-size:40px;color:var(--accent);margin-bottom:8px;"><i class="fas fa-file-invoice-dollar"></i></div>
+          <div style="font-size:26px;font-weight:800;">Rs. ${(amt||0).toLocaleString()}</div>
+          <span class="badge ${pc}" style="margin-top:8px;">${(status||'').toUpperCase()}</span>
+        </div>
+        <div style="background:var(--bg-body);padding:14px;border-radius:10px;">
+          <div class="inv-row"><span>Buyer</span><strong>${buyer}</strong></div>
+          <div class="inv-row"><span>Seller</span><strong>${sellN}</strong></div>
+          <div class="inv-row"><span>Method</span><strong>${method}</strong></div>
+          <div class="inv-row"><span>Transaction ID</span><strong>${txn||'N/A'}</strong></div>
+          <div class="inv-row"><span>Date</span><strong>${date}</strong></div>
+        </div>
+        ${sshot?`<img src="${sshot}" style="width:100%;max-height:190px;object-fit:contain;border-radius:8px;border:1px solid var(--border);margin-top:14px;cursor:pointer;" onclick="openImg('${sshot}')" alt="Proof">`:''}
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn sec" onclick="this.closest('.modal-overlay').remove()">Close</button>
+        <button class="modal-btn pri" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+}
+
+// ── IMAGE MODAL ────────────────────────────
+function openImg(src){
+  document.getElementById('bigImg').src=src;
+  document.getElementById('imgModal').classList.add('active');
+}
+function closeImgModal(){
+  document.getElementById('imgModal').classList.remove('active');
+}
+
+// ── EXPORT CSV ─────────────────────────────
+function exportCSV(){
+  let csv='Order ID,Date,Buyer Name,Buyer Phone,Address,Product,Qty,Price,Delivery,Total,Seller Name,Seller Phone,Order Status,Payment Type,Payment Status,TXN ID\n';
+  orders.forEach(ord=>{
+    const p=parseProd(ord.product);
+    const s=getSeller(ord.sellerPhone);
+    const pay=getPayment(ord.id);
+    const dt=fmtDate(ord.createdAt);
+    const total=p.price*p.qty+p.delivery;
+    csv+=`${ord.id},${dt.d},"${ord.buyerName||''}","${ord.buyerPhone||''}","${(ord.address||'').replace(/"/g,"'")}","${p.title.replace(/"/g,"'")}",${p.qty},${p.price},${p.delivery},${total},"${s.name||''}","${ord.sellerPhone||''}",${ord.status},${pay?'Advance':'COD'},${pay?pay.status:'N/A'},${pay?pay.transactionId||'':''}\n`;
+  });
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`delightpk_orders_${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast('Orders export ho gayi!');
+}
+
+// ── INIT ───────────────────────────────────
+window.onload=loadData;
+</script>
+</body>
+</html>
